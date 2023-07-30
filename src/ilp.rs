@@ -1,8 +1,8 @@
 use std::collections::HashMap;
+use log::debug;
 
 use good_lp::{
-    default_solver,
-    Constraint, Expression, ProblemVariables, ResolutionError, Solution,
+    default_solver, Constraint, Expression, ProblemVariables, ResolutionError, Solution,
     SolverModel, Variable, VariableDefinition,
 };
 
@@ -50,9 +50,9 @@ impl From<Vec<(String, u64)>> for ProblemInstance {
 fn interpret_solution(w_vars: HashMap<(usize, usize), Variable>, graph: Graph, sol: impl Solution) {
     for ((u, v), w_x) in w_vars {
         let res = sol.value(w_x);
-        if res == 0.0 {
-            continue;
-        }
+        // if res == 0.0 {
+        //     continue;
+        // }
         println!(
             "{:?} to {:?}: {:?}",
             graph.get_node_name(u).unwrap_or(u.to_string()),
@@ -125,7 +125,7 @@ impl ProblemInstance {
     ///     for all v in V: w(v) + sum_((u,v) in E) w_(u,v) - sum_((v,u) in E) w_e
     fn build_constraints_vertex(&self) -> Vec<Constraint> {
         let mut constraints: Vec<Constraint> = vec![];
-        let avg: f64 = self.g.get_average_vertex_weight() as f64;
+        let avg: f64 = self.g.get_average_vertex_weight();
         for v in self.g.vertices.iter().clone() {
             let vars_in: Vec<&Variable> = self
                 .g
@@ -139,6 +139,8 @@ impl ProblemInstance {
                 .iter()
                 .map(|e| self.w_vars.get(&(e.u, e.v)).unwrap())
                 .collect();
+            println!("{:?}", vars_out);
+            println!("{:?}", vars_in);
             let mut constraint: Expression = (v.weight as f64).into();
             vars_in
                 .into_iter()
@@ -163,6 +165,7 @@ fn build_x_vars(g: &Graph) -> HashMap<(usize, usize), VariableDefinition> {
                 .binary()
                 .name(format!("x_({}, {})", name_u, name_v)),
         );
+        debug!("Created binary Var x_({}, {})", name_u, name_v);
     });
     vars
 }
@@ -181,6 +184,7 @@ fn build_w_vars(g: &Graph) -> HashMap<(usize, usize), VariableDefinition> {
                 .max(upper_bound)
                 .name(format!("w_({}, {})", name_u, name_v)),
         );
+        debug!("Created integer Var w_({}, {}) from 0 to {}", name_u, name_v, upper_bound);
     });
     vars
 }

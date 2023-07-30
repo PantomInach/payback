@@ -1,20 +1,21 @@
 use itertools::Itertools;
 use std::iter::zip;
+use log::debug;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub(crate) struct NamedNode {
     pub(crate) id: usize,
     pub(crate) name: String,
     pub(crate) weight: u64,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub(crate) struct Edge {
     pub(crate) u: usize,
     pub(crate) v: usize,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub(crate) struct Graph {
     pub(crate) vertices: Vec<NamedNode>,
     pub(crate) edges: Vec<Edge>,
@@ -53,7 +54,9 @@ impl Graph {
             let v: usize = *uv.get(1).unwrap();
             edges.push(Edge { u, v });
         }
-        Graph { vertices, edges }
+        let g = Graph { vertices, edges };
+        debug!("Created following graph:\n{}", g.to_string());
+        g
     }
 
     pub(crate) fn edge_weight_upper_bound(&self) -> u64 {
@@ -71,8 +74,8 @@ impl Graph {
         self.get_node_name(id).unwrap_or(or)
     }
 
-    pub(crate) fn get_average_vertex_weight(&self) -> u64 {
-        self.vertices.iter().map(|v| v.weight).sum()
+    pub(crate) fn get_average_vertex_weight(&self) -> f64 {
+        self.vertices.iter().map(|v| v.weight).sum::<u64>() as f64 / (self.vertices.len() as f64)
     }
 
     pub(crate) fn edges_into(&self, v: usize) -> Vec<Edge> {
@@ -91,7 +94,19 @@ impl Graph {
             .collect_vec()
     }
 
-    pub(crate) fn get_node_name_from_node(&self, v: NamedNode) -> Option<String> {
-        self.get_node_name(v.id)
+    // pub(crate) fn get_node_name_from_node(&self, v: NamedNode) -> Option<String> {
+    //     self.get_node_name(v.id)
+    // }
+
+    pub(crate) fn to_string(&self) -> String {
+        let mut out: String = "Vertices:".to_string();
+        out = self.vertices.iter().fold(out, |acc, v| {
+            acc + " " + &v.name.to_string() + ": " + &v.weight.to_string() + ";"
+        });
+        out += &"\nEdges:".to_string();
+        out = self.edges.iter().fold(out, |acc, e| {
+            acc + " " + &e.u.to_string() + " -> " + &e.v.to_string() + ";"
+        });
+        out
     }
 }

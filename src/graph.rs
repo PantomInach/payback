@@ -1,9 +1,7 @@
 use itertools::Itertools;
 use log::debug;
-use std::{
-    collections::{HashMap, HashSet},
-    iter::zip, borrow::BorrowMut,
-};
+use std::collections::{HashMap, HashSet};
+use std::iter::zip;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct NamedNode {
@@ -91,6 +89,24 @@ impl From<Vec<NamedNode>> for Graph {
     }
 }
 
+impl From<Vec<&NamedNode>> for Graph {
+    fn from(value: Vec<&NamedNode>) -> Self {
+        let edges = value
+            .iter()
+            .permutations(2)
+            .map(|uv| {
+                let u = uv.first().unwrap();
+                let v = uv.get(1).unwrap();
+                Edge { u: u.id, v: v.id }
+            })
+            .collect();
+        Graph {
+            vertices: value.into_iter().map(|x| x.to_owned()).collect(),
+            edges,
+        }
+    }
+}
+
 /// Functions to create Graphs from weighted edges.
 impl From<HashMap<(String, String), i64>> for Graph {
     fn from(value: HashMap<(String, String), i64>) -> Self {
@@ -99,11 +115,8 @@ impl From<HashMap<(String, String), i64>> for Graph {
             unique_v.insert(s1.to_string());
             unique_v.insert(s2.to_string());
         });
-        let mut name_weight_tup: HashMap<String, i64> = unique_v
-            .clone()
-            .into_iter()
-            .map(|x| (x, 0 as i64))
-            .collect();
+        let mut name_weight_tup: HashMap<String, i64> =
+            unique_v.clone().into_iter().map(|x| (x, 0_i64)).collect();
         for uv in unique_v.into_iter().permutations(2) {
             let u: &String = uv.first().unwrap();
             let v: &String = uv.get(1).unwrap();
@@ -153,6 +166,14 @@ impl Graph {
         self.vertices.iter().map(|node| node.weight).sum()
     }
 
+    pub(crate) fn get_node_from_name(&self, s: String) -> Option<&NamedNode> {
+        self.vertices.iter().find(|v| v.name == s)
+    }
+
+    fn get_node_from_id(&self, id: usize) -> Option<&NamedNode> {
+        self.vertices.iter().find(|v| v.id == id)
+    }
+
     pub(crate) fn get_node_name(&self, id: usize) -> Option<String> {
         self.vertices
             .iter()
@@ -162,6 +183,14 @@ impl Graph {
 
     pub(crate) fn get_node_name_or(&self, id: usize, or: String) -> String {
         self.get_node_name(id).unwrap_or(or)
+    }
+
+    pub(crate) fn get_edge_from_vertex_names(&self, s1: String, s2: String) -> Option<&Edge> {
+        self.edges.iter().find(|e| {
+            let v = self.get_node_from_id(e.v).unwrap();
+            let u = self.get_node_from_id(e.u).unwrap();
+            (u.name == s1 && v.name == s2) || (u.name == s2 && v.name == s1)
+        })
     }
 
     pub(crate) fn get_average_vertex_weight(&self) -> f64 {

@@ -1,14 +1,11 @@
 [package]
 name = "payback"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 env_logger = "0.10.0"
-# good_lp = { version = "1.4.0", features = ["highs"], default-features = false }
-# good_lp = { version = "1.4.0", features = ["lp-solvers"], default-features = false }
-good_lp = { version = "1.4.0", features = ["lpsolve"], default-features = false }
 itertools = "0.11.0"
 log = "0.4.19"

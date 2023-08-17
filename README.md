@@ -6,7 +6,7 @@
       - [From Vec<((String, String), i64)>](#from-vecstring-string-i64)
       - [From HashMap<(String, String), i64>](#from-hashmapstring-string-i64)
     - [Via Vertex Weights](#via-vertex-weights)
-      - [From Vec<i64>](#from-veci64)
+      - [From Vec\<i64\>](#from-veci64)
       - [From Vec<(String, i64)>](#from-vecstring-i64)
       - [From HashMap<String, i64>](#from-hashmapstring-i64)
   - [Solving](#solving)
@@ -37,7 +37,7 @@ A -- 1 --> C;
 A -- 1 --> D;
 B -- 1 --> D;
 ```
-The graph from this representation will just be converted to a graph from #via-vertex-weights.
+The graph from this representation will just be converted to a graph from [Via Vertex Weights](#via-vertex-weights).
 
 #### From Vec<((String, String), i64)>
 ```rust
@@ -67,7 +67,7 @@ We show how to create the following nodes and their weights.
 | --- | --- | --- | ---| ---|
 | Weight | -2 | -1 | 1 | 2 |
 
-#### From Vec<i64>
+#### From Vec\<i64\>
 ```rust
 let input: Vec<i64> = vec![-2, -1, 1, 2];
 let graph: Graph = input.into();
@@ -116,20 +116,20 @@ This can lead to a suboptimal amount of total money moved.
 This approximation algorithm only uses the minimal required amount of total money moved.
 
 ### ProblemInstancePartition
-We can create a problem instance from a graph (see #generating-graphs).
+We can create a problem instance from a graph (see [here](#generating-graphs)).
 ```rust
 let graph: Graph = ...;
 let instance: ProblemInstancePartition = ProblemInstancePartition::from(graph).solve();
 ```
 
 This algorithm gives an exact solution for the instance and uses one of the approximation algorithms. Depending on which approximation algorithm is chosen the solution can vary.
-For #star-expand:
+For [Star Expand](#star-expand):
 ```rust
 instance.solve_and_interpret_with(partition::PartitionSolvingMethod::StarExpand);
 // "C" to "B": 1.0
 // "D" to "A": 2.0
 ```
-And for #greedy-satisfaction:
+And for [Greedy Satisfaction](#greedy-satisfaction):
 ```rust
 instance.solve_and_interpret_with(partition::PartitionSolvingMethod::StarExpand);
 // "D" to "A": 2.0

@@ -10,10 +10,6 @@
       - [From Vec<(String, i64)>](#from-vecstring-i64)
       - [From HashMap<String, i64>](#from-hashmapstring-i64)
   - [Solving](#solving)
-    - [ProblemInstancesApproxmiation](#probleminstancesapproxmiation)
-      - [Star Expand](#star-expand)
-      - [Greedy Satisfaction](#greedy-satisfaction)
-    - [ProblemInstancePartition](#probleminstancepartition)
 - [Note](#note)
 <!--toc:end-->
 
@@ -98,42 +94,44 @@ let graph: Graph = input.into();
 Here the nodes are named `A`, `B`, `C`, `D`.
 
 ## Solving
-Now that we have described the problem instance with a graph we can solve it. For that purpose we create a `ProblemInastance`, which describes who the instance will be solved.
-| Available ProblemInstances with solver | Description |
-| --- | --- |
-| ProblemInstancePartition | Generates all partitionings of the vertex set and, for each partition of a partitioning, merges the solutions obtained by an approximation algorithm of the partitions. Then the solution of the largest partitioning is returned. This is an exact answer. |
-| ProblemInstanceApproximation | TO BE IMPLEMENTED. |
+Available solver:
+| Solver | Type | Description |
+| --- | --- | --- |
+| Star Expand | 2 Approximation | Approximates optimal solution by choosing central node, to which all edges are incident. |
+| Greedy Satisfaction | 2 Approximation | Approximates optimal solution while minimizing the total weight of all edges. |
+| Partitioning with Star Expand | Exact | Partitioning based exact solver, which solves base cases with Star Expand. |
+| Partitioning with Greedy Satisfaction | Partitioning based exact solver, which solves base cases with Greedy Satisfaction. |
 
-### ProblemInstancesApproxmiation
-**TO BE IMPLEMENTED**
-We have two approximation algorithms, which have at most double the amount of edges of an optimal solution.
+Approximation algorithm don't necessarily return the optimal solution but theirs is not worse than a given factor. Also, they run in polynomial time.
 
-#### Star Expand
-This approximation algorithm focuses the load of solving the instance on one node. This helps the mitigate untrustworthy person by not routing additional money through them. 
-This can lead to a suboptimal amount of total money moved.
+Exact algorithm give the optimal solution, but its runtime is not polynomial. This can lead to long runtimes while working with larger inputs. Generally it is uncommon to have an instance, for which an approximation algorithm does not return the optimal answer.
 
-#### Greedy Satisfaction
-This approximation algorithm only uses the minimal required amount of total money moved.
-
-### ProblemInstancePartition
-We can create a problem instance from a graph (see [here](#generating-graphs)).
+### Using Star Expand
 ```rust
-let graph: Graph = ...;
-let instance: ProblemInstancePartition = ProblemInstancePartition::from(graph).solve();
+let instance = ProblemInstance::from(graph);
+let sol = <dyn SolverApproximation::<StarExpand> as Solver>::solve(&instance);
+instance.print_solution(sol);
 ```
 
-This algorithm gives an exact solution for the instance and uses one of the approximation algorithms. Depending on which approximation algorithm is chosen the solution can vary.
-For [Star Expand](#star-expand):
+### Using Greedy Satisfaction 
 ```rust
-instance.solve_and_interpret_with(partition::PartitionSolvingMethod::StarExpand);
-// "C" to "B": 1.0
-// "D" to "A": 2.0
+let instance = ProblemInstance::from(graph);
+let sol = <dyn SolverApproximation::<GreedySatisfaction> as Solver>::solve(&instance);
+instance.print_solution(sol);
 ```
-And for [Greedy Satisfaction](#greedy-satisfaction):
+
+### Using Partitioning with Star Expand
 ```rust
-instance.solve_and_interpret_with(partition::PartitionSolvingMethod::StarExpand);
-// "D" to "A": 2.0
-// "C" to "B": 1.0
+let instance = ProblemInstance::from(graph);
+let sol = <dyn SolverPartitioning::<StarExpand> as Solver>::solve(&instance);
+instance.print_solution(sol);
+```
+
+### Using Partitioning with Greedy Satisfaction
+```rust
+let instance = ProblemInstance::from(graph);
+let sol = <dyn SolverPartitioning::<GreedySatisfaction> as Solver>::solve(&instance);
+instance.print_solution(sol);
 ```
 
 # Note

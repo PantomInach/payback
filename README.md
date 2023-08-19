@@ -100,7 +100,7 @@ Available solver:
 | Star Expand | 2 Approximation | Approximates optimal solution by choosing central node, to which all edges are incident. |
 | Greedy Satisfaction | 2 Approximation | Approximates optimal solution while minimizing the total weight of all edges. |
 | Partitioning with Star Expand | Exact | Partitioning based exact solver, which solves base cases with Star Expand. |
-| Partitioning with Greedy Satisfaction | Partitioning based exact solver, which solves base cases with Greedy Satisfaction. |
+| Partitioning with Greedy Satisfaction | Exact | Partitioning based exact solver, which solves base cases with Greedy Satisfaction. |
 
 Approximation algorithm don't necessarily return the optimal solution but theirs is not worse than a given factor. Also, they run in polynomial time.
 

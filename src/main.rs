@@ -13,7 +13,7 @@ pub mod solver;
 
 /// Calculate to resolve debt networks with as few transactions as possible.
 ///
-/// If you have a network of people, which own each other money, paying off debts can lead to many transactions. 
+/// If you have a network of people, which own each other money, paying off debts can lead to many transactions.
 /// With this crate the amount of transactions can be minimized.
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about)]

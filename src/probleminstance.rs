@@ -113,31 +113,30 @@ impl ProblemInstance {
                     .iter()
                     .map(|v| (v.to_owned(), pet_graph.add_node(v.name.to_owned())))
                     .collect();
-                sol.iter()
-                    .try_for_each(|(e, w)| -> Result<(), String> {
-                        let u = self
-                            .g
-                            .get_node_from_id(e.u)
-                            .ok_or(format!("Can't find vertex with index {:?}", e.u))
-                            .and_then(|u_node| {
-                                node_map.get(u_node).ok_or(format!(
-                                    "Can't find node '{:?}' in the pet graph.",
-                                    u_node.name
-                                ))
-                            })?;
-                        let v = self
-                            .g
-                            .get_node_from_id(e.v)
-                            .ok_or(format!("Can't find vertex with index {:?}", e.v))
-                            .and_then(|v_node| {
-                                node_map.get(v_node).ok_or(format!(
-                                    "Can't find node '{:?}' in the pet graph.",
-                                    v_node.name
-                                ))
-                            })?;
-                        pet_graph.update_edge(v.to_owned(), u.to_owned(), *w);
-                        Ok(())
-                    })?;
+                sol.iter().try_for_each(|(e, w)| -> Result<(), String> {
+                    let u = self
+                        .g
+                        .get_node_from_id(e.u)
+                        .ok_or(format!("Can't find vertex with index {:?}", e.u))
+                        .and_then(|u_node| {
+                            node_map.get(u_node).ok_or(format!(
+                                "Can't find node '{:?}' in the pet graph.",
+                                u_node.name
+                            ))
+                        })?;
+                    let v = self
+                        .g
+                        .get_node_from_id(e.v)
+                        .ok_or(format!("Can't find vertex with index {:?}", e.v))
+                        .and_then(|v_node| {
+                            node_map.get(v_node).ok_or(format!(
+                                "Can't find node '{:?}' in the pet graph.",
+                                v_node.name
+                            ))
+                        })?;
+                    pet_graph.update_edge(v.to_owned(), u.to_owned(), *w);
+                    Ok(())
+                })?;
                 Ok(Dot::new(&pet_graph).to_string())
             }
         }

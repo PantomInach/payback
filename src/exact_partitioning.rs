@@ -29,9 +29,7 @@ where
     solution
 }
 
-fn partition_solver<S: ApproxomationScheme>(
-    partitioning: &Vec<Vec<&NamedNode>>,
-) -> Solution
+fn partition_solver<S: ApproxomationScheme>(partitioning: &Vec<Vec<&NamedNode>>) -> Solution
 where
     ProblemInstance: SolverApproximation<S>,
 {
@@ -98,7 +96,7 @@ mod tests {
     use crate::exact_partitioning::collect_all_partitionigns;
     use crate::graph::Graph;
     use crate::probleminstance::ProblemInstance;
-    use crate::solver::{SolverPartitioning, Solver};
+    use crate::solver::{Solver, SolverPartitioning};
     use env_logger::Env;
     use log::debug;
 
@@ -115,7 +113,7 @@ mod tests {
         let graph: Graph = vec![-1, -1, 1, 1, 2, -2, 3, -3].into();
         debug!("Using graph: {:?}", graph);
         let instance = ProblemInstance::from(graph);
-        let sol = <dyn SolverPartitioning::<GreedySatisfaction> as Solver>::solve(&instance);
+        let sol = <dyn SolverPartitioning<GreedySatisfaction> as Solver>::solve(&instance);
         assert!(sol.is_some());
         debug!("Proposed solution by solver: {:?}", sol);
         assert!(sol.unwrap().len() == 4);

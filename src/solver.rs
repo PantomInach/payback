@@ -32,7 +32,7 @@ impl Solver for dyn SolverExact {
     }
 }
 
-impl<S: ApproxomationScheme> SolverExact for dyn SolverPartitioning<S>{
+impl<S: ApproxomationScheme> SolverExact for dyn SolverPartitioning<S> {
     fn solve_exact(&self) -> Solution {
         self.solve_via_partitioning()
     }

@@ -163,7 +163,7 @@ Usage: `payback [OPTIONS] <FILE> [OUTPUT] [METHOD]`
 For the `[OPTIONS]` see the help of payback.
 `[OUTPUT]` specifies in which format the result should be given back to the stdout. Here are the options `dot` and `transactions` available. With `dot` a [graphviz](https://graphviz.org) parsable output is given, which can immediately be turned into a graph. With `transactions` the edges and their weights of the solution are just printed.
 `[METHOD]` determines the solving algorithm as in #Solving.
-The `<FILE>` options should give the graph. Either point to a file or pipe it into the stdin. The format is a `csv`. One can either specify the nodes with their weights as in [From Vec<(String, i64)>](#from-vecstring-i64) or the edges with their weights as in [From HashMap<(String, String), i64>](#from-hashmapstring-i64).
+The `<FILE>` options should give the graph. Either point to a file or pipe it into the stdin. The format is a `csv`. One can either specify the nodes with their weights as in [From Vec<(String, i64)>](#from-vecstring-i64) or the edges with their weights as in [From HashMap<(String, String), i64>](#from-hashmapstring-string-i64).
 
 If you want to input this graph
 ```mermaid

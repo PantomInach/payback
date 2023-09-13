@@ -87,9 +87,9 @@ impl ProblemInstance {
                     let u = self.g.get_node_name_or(edge.u, edge.u.to_string());
                     let v = self.g.get_node_name_or(edge.v, edge.v.to_string());
                     if *weight >= 0.0 {
-                        res += &format!("{:?} to {:?}: {:?}", u, v, weight);
+                        res += &format!("{:?} to {:?}: {:?}", v, u, weight);
                     } else {
-                        res += &format!("{:?} to {:?}: {:?}", v, u, -weight);
+                        res += &format!("{:?} to {:?}: {:?}", u, v, -weight);
                     }
                     res += LINE_ENDING;
                 }
@@ -135,7 +135,7 @@ impl ProblemInstance {
                                     v_node.name
                                 ))
                             })?;
-                        pet_graph.update_edge(u.to_owned(), v.to_owned(), *w);
+                        pet_graph.update_edge(v.to_owned(), u.to_owned(), *w);
                         Ok(())
                     })?;
                 Ok(Dot::new(&pet_graph).to_string())

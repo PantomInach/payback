@@ -182,10 +182,7 @@ impl Graph {
         g
     }
 
-    pub(crate) fn edge_weight_upper_bound(&self) -> i64 {
-        self.vertices.iter().map(|node| node.weight).sum()
-    }
-
+    #[allow(dead_code)]
     pub(crate) fn get_node_from_name(&self, s: String) -> Option<&NamedNode> {
         self.vertices.iter().find(|v| v.name == s)
     }
@@ -205,37 +202,9 @@ impl Graph {
         self.get_node_name(id).unwrap_or(or)
     }
 
-    pub(crate) fn get_edge_from_vertex_names(&self, s1: String, s2: String) -> Option<&Edge> {
-        self.edges.iter().find(|e| {
-            let v = self.get_node_from_id(e.v).unwrap();
-            let u = self.get_node_from_id(e.u).unwrap();
-            (u.name == s1 && v.name == s2) || (u.name == s2 && v.name == s1)
-        })
-    }
-
     pub(crate) fn get_average_vertex_weight(&self) -> f64 {
         self.vertices.iter().map(|v| v.weight).sum::<i64>() as f64 / (self.vertices.len() as f64)
     }
-
-    pub(crate) fn edges_into(&self, v: usize) -> Vec<Edge> {
-        self.edges
-            .iter()
-            .filter(|e| e.v == v)
-            .cloned()
-            .collect_vec()
-    }
-
-    pub(crate) fn edges_out(&self, u: usize) -> Vec<Edge> {
-        self.edges
-            .iter()
-            .filter(|e| e.u == u)
-            .cloned()
-            .collect_vec()
-    }
-
-    // pub(crate) fn get_node_name_from_node(&self, v: NamedNode) -> Option<String> {
-    //     self.get_node_name(v.id)
-    // }
 
     pub(crate) fn to_string(&self) -> String {
         let mut out: String = "Vertices:".to_string();
@@ -249,13 +218,4 @@ impl Graph {
         out
     }
 
-    pub(crate) fn induce(&self, vertices: Vec<usize>) -> Graph {
-        let new_vertices: Vec<NamedNode> = self
-            .vertices
-            .clone()
-            .into_iter()
-            .filter(|v| vertices.contains(&v.id))
-            .collect();
-        Graph::from(new_vertices)
-    }
 }

@@ -3,7 +3,9 @@ use log::debug;
 use std::collections::{HashMap, HashSet};
 use std::iter::zip;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+use crate::graph_parser::deserialize_string_to_graph;
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub(crate) struct NamedNode {
     pub(crate) id: usize,
     pub(crate) name: String,
@@ -35,6 +37,24 @@ impl PartialOrd for NamedNode {
             (u, v) if u == v => Some(std::cmp::Ordering::Equal),
             (u, v) if u < v => Some(std::cmp::Ordering::Less),
             (_, _) => None,
+        }
+    }
+}
+
+/// Parses a String and converts it to a graph.
+impl TryFrom<String> for Graph {
+    type Error = &'static str;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        match deserialize_string_to_graph(&value) {
+            Ok(graph) => Ok(graph),
+            Err(err_tup) => {
+                debug!(
+                    "Unable to parse string '{}' into graph because of errors.\n1.{}\n2.{}",
+                    value, err_tup.0, err_tup.1
+                );
+                Err("Unable to parse string into graph.")
+            }
         }
     }
 }
@@ -170,7 +190,7 @@ impl Graph {
         self.vertices.iter().find(|v| v.name == s)
     }
 
-    fn get_node_from_id(&self, id: usize) -> Option<&NamedNode> {
+    pub(crate) fn get_node_from_id(&self, id: usize) -> Option<&NamedNode> {
         self.vertices.iter().find(|v| v.id == id)
     }
 

@@ -1,11 +1,9 @@
 use log::debug;
 use std::collections::HashMap;
 
-use crate::{
-    graph::{Edge, NamedNode},
-    probleminstance::ProblemInstance,
-    solver::SolverApproximation,
-};
+use crate::graph::{Edge, NamedNode};
+use crate::probleminstance::{ProblemInstance, Solution};
+use crate::solver::SolverApproximation;
 
 pub(crate) trait ApproxomationScheme {}
 
@@ -16,7 +14,7 @@ impl ApproxomationScheme for StarExpand {}
 impl ApproxomationScheme for GreedySatisfaction {}
 
 impl SolverApproximation<StarExpand> for ProblemInstance {
-    fn solve_approx(&self) -> Option<HashMap<Edge, f64>> {
+    fn solve_approx(&self) -> Solution {
         debug!("Running 'star_expand' for graph: {:?}", self.g.to_string());
         if !self.is_solvable() {
             None
@@ -58,7 +56,7 @@ impl SolverApproximation<StarExpand> for ProblemInstance {
 }
 
 impl SolverApproximation<GreedySatisfaction> for ProblemInstance {
-    fn solve_approx(&self) -> Option<HashMap<Edge, f64>> {
+    fn solve_approx(&self) -> Solution {
         debug!(
             "Running 'greedy_satisfaction' for graph: {:?}",
             self.g.to_string()

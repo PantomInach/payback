@@ -4,22 +4,22 @@ use std::collections::HashMap;
 
 use crate::approximation::{ApproxomationScheme, GreedySatisfaction, StarExpand};
 use crate::graph::{Edge, Graph, NamedNode};
-use crate::probleminstance::ProblemInstance;
+use crate::probleminstance::{ProblemInstance, Solution};
 use crate::solver::{SolverApproximation, SolverPartitioning};
 
 impl SolverPartitioning<StarExpand> for ProblemInstance {
-    fn solve_via_partitioning(&self) -> Option<HashMap<Edge, f64>> {
+    fn solve_via_partitioning(&self) -> Solution {
         solve_with::<StarExpand>(&self.g)
     }
 }
 
 impl SolverPartitioning<GreedySatisfaction> for ProblemInstance {
-    fn solve_via_partitioning(&self) -> Option<HashMap<Edge, f64>> {
+    fn solve_via_partitioning(&self) -> Solution {
         solve_with::<GreedySatisfaction>(&self.g)
     }
 }
 
-fn solve_with<S: ApproxomationScheme>(graph: &Graph) -> Option<HashMap<Edge, f64>>
+fn solve_with<S: ApproxomationScheme>(graph: &Graph) -> Solution
 where
     ProblemInstance: SolverApproximation<S>,
 {
@@ -31,14 +31,14 @@ where
 
 fn partition_solver<S: ApproxomationScheme>(
     partitioning: &Vec<Vec<&NamedNode>>,
-) -> Option<HashMap<Edge, f64>>
+) -> Solution
 where
     ProblemInstance: SolverApproximation<S>,
 {
     let mut acc: HashMap<Edge, f64> = HashMap::new();
     for partition in partitioning {
         let g: ProblemInstance = Graph::from(partition.to_vec()).into();
-        let result: Option<HashMap<Edge, f64>> = g.solve_approx();
+        let result: Solution = g.solve_approx();
         match result {
             Some(map) => {
                 acc.extend(map);

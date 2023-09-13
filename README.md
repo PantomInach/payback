@@ -1,4 +1,5 @@
 # Payback
+[![Rust](https://github.com/PantomInach/payback/actions/workflows/rust.yml/badge.svg)](https://github.com/PantomInach/payback/actions/workflows/rust.yml)
 
 If you have a network of people, which own each other money, paying off debts can lead to many transactions. With this crate the amount of transactions can be minimized.
 

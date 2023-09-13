@@ -7,31 +7,37 @@ use probleminstance::{ProblemInstance, SolvingMethods};
 pub mod approximation;
 pub mod exact_partitioning;
 pub mod graph;
+pub mod graph_parser;
 pub mod probleminstance;
 pub mod solver;
-pub mod graph_parser;
 
-/// Test
+/// Calculate to resolve debt networks with as few transactions as possible.
+///
+/// If you have a network of people, which own each other money, paying off debts can lead to many transactions. 
+/// With this crate the amount of transactions can be minimized.
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(author, version, about, long_about)]
 struct Args {
-    /// Specify input via file
+    /// Path to the input file. Use '-' instead to use the stdin.
+    /// The data must be in a csv format.
+    /// Either specify edge with 'NodeNameFrom,NodeNameTo,weight' or nodes with 'NodeName,weight'.
+    /// You can't mix these to formats.
     #[arg(group = "input")]
     file: FileOrStdin,
 
-    /// Turns on verbose output
+    /// Turns on verbose output.
     #[arg(short = 'v', long)]
     verbose: bool,
 
-    /// Turn on debug output
+    /// Turn on debug output.
     #[arg(short = 'd', long)]
     debug: bool,
 
-    /// Output method
+    /// Specify the format of the output to stdout.
     #[arg(value_enum, default_value_t = OutputFormat::Transactions)]
     output: OutputFormat,
 
-    /// Specify solving method
+    /// Tell payback with solving method should be used.
     #[arg(value_enum, default_value_t = SolvingMethods::ApproxStarExpand)]
     method: SolvingMethods,
 }
@@ -63,10 +69,10 @@ fn main() -> Result<(), String> {
         Ok(s) => {
             println!("{}", s);
             Ok(())
-        },
+        }
         Err(s) => {
             println!("Error: {}", s);
             Err(s)
-        },
+        }
     }
 }

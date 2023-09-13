@@ -1,6 +1,7 @@
 use itertools::Itertools;
 use log::debug;
 use std::collections::{HashMap, HashSet};
+use std::fmt::Display;
 use std::iter::zip;
 
 use crate::graph_parser::deserialize_string_to_graph;
@@ -159,6 +160,19 @@ impl From<Vec<((String, String), i64)>> for Graph {
     }
 }
 
+impl Display for Graph {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut out = self.vertices.iter().fold(Ok(()), |acc, v| {
+            acc.and_then(|_| write!(f, "{}: {}; ", &v.name, &v.weight))
+        });
+        out = out.and_then(|_| writeln!(f));
+        out = out.and_then(|_| write!(f, "Edges: "));
+        self.edges.iter().fold(out, |acc, e| {
+            acc.and_then(|_| write!(f, "{} -> {}; ", &e.u, &e.v))
+        })
+    }
+}
+
 impl Graph {
     pub(crate) fn new(names: Vec<String>, weights: Vec<i64>) -> Self {
         assert!(
@@ -205,17 +219,4 @@ impl Graph {
     pub(crate) fn get_average_vertex_weight(&self) -> f64 {
         self.vertices.iter().map(|v| v.weight).sum::<i64>() as f64 / (self.vertices.len() as f64)
     }
-
-    pub(crate) fn to_string(&self) -> String {
-        let mut out: String = "Vertices:".to_string();
-        out = self.vertices.iter().fold(out, |acc, v| {
-            acc + " " + &v.name.to_string() + ": " + &v.weight.to_string() + ";"
-        });
-        out += "\nEdges:";
-        out = self.edges.iter().fold(out, |acc, e| {
-            acc + " " + &e.u.to_string() + " -> " + &e.v.to_string() + ";"
-        });
-        out
-    }
-
 }

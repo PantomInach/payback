@@ -1,6 +1,6 @@
 [package]
 name = "payback"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 description = "Calculate to resolve debt networks with as few transactions as possible."
 readme = "README.md"

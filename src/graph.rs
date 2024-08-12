@@ -33,12 +33,7 @@ impl Ord for NamedNode {
 
 impl PartialOrd for NamedNode {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        match (self.weight, other.weight) {
-            (u, v) if u > v => Some(std::cmp::Ordering::Greater),
-            (u, v) if u == v => Some(std::cmp::Ordering::Equal),
-            (u, v) if u < v => Some(std::cmp::Ordering::Less),
-            (_, _) => None,
-        }
+        Some(self.cmp(other))
     }
 }
 
@@ -160,6 +155,7 @@ impl From<Vec<((String, String), i64)>> for Graph {
     }
 }
 
+#[allow(clippy::manual_try_fold)]
 impl Display for Graph {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut out = self.vertices.iter().fold(Ok(()), |acc, v| {

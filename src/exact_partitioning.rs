@@ -2,41 +2,29 @@ use itertools::Itertools;
 use log::debug;
 use std::collections::HashMap;
 
-use crate::approximation::{ApproxomationScheme, GreedySatisfaction, StarExpand};
 use crate::graph::{Edge, Graph, NamedNode};
 use crate::probleminstance::{ProblemInstance, Solution};
-use crate::solver::{SolverApproximation, SolverPartitioning};
 
-impl SolverPartitioning<StarExpand> for ProblemInstance {
-    fn solve_via_partitioning(&self) -> Solution {
-        solve_with::<StarExpand>(&self.g)
-    }
-}
-
-impl SolverPartitioning<GreedySatisfaction> for ProblemInstance {
-    fn solve_via_partitioning(&self) -> Solution {
-        solve_with::<GreedySatisfaction>(&self.g)
-    }
-}
-
-fn solve_with<S: ApproxomationScheme>(graph: &Graph) -> Solution
-where
-    ProblemInstance: SolverApproximation<S>,
-{
-    let mut partitionings = collect_all_partitionigns(&graph.vertices);
+pub(crate) fn naive_all_partitioning(
+    instance: &ProblemInstance,
+    approx_solver: &dyn Fn(&ProblemInstance) -> Solution,
+) -> Solution {
+    let mut partitionings = collect_all_partitionigns(&instance.g.vertices);
     partitionings.sort_by_key(|a| std::cmp::Reverse(a.len()));
-    let solution = partitionings.iter().find_map(|x| partition_solver::<S>(x));
+    let solution = partitionings
+        .iter()
+        .find_map(|x| partition_solver(x, approx_solver));
     solution
 }
 
-fn partition_solver<S: ApproxomationScheme>(partitioning: &Vec<Vec<&NamedNode>>) -> Solution
-where
-    ProblemInstance: SolverApproximation<S>,
-{
+fn partition_solver(
+    partitioning: &Vec<Vec<&NamedNode>>,
+    approx_solver: &dyn Fn(&ProblemInstance) -> Solution,
+) -> Solution {
     let mut acc: HashMap<Edge, f64> = HashMap::new();
     for partition in partitioning {
-        let g: ProblemInstance = Graph::from(partition.to_vec()).into();
-        let result: Solution = g.solve_approx();
+        let instance: ProblemInstance = Graph::from(partition.to_vec()).into();
+        let result: Solution = approx_solver(&instance);
         match result {
             Some(map) => {
                 acc.extend(map);
@@ -92,11 +80,11 @@ where
 mod tests {
     use std::collections::HashSet;
 
-    use crate::approximation::GreedySatisfaction;
+    use crate::approximation::greedy_satisfaction;
     use crate::exact_partitioning::collect_all_partitionigns;
+    use crate::exact_partitioning::naive_all_partitioning;
     use crate::graph::Graph;
     use crate::probleminstance::ProblemInstance;
-    use crate::solver::{Solver, SolverPartitioning};
     use env_logger::Env;
     use log::debug;
 
@@ -113,7 +101,7 @@ mod tests {
         let graph: Graph = vec![-1, -1, 1, 1, 2, -2, 3, -3].into();
         debug!("Using graph: {:?}", graph);
         let instance = ProblemInstance::from(graph);
-        let sol = <dyn SolverPartitioning<GreedySatisfaction> as Solver>::solve(&instance);
+        let sol = naive_all_partitioning(&instance, &greedy_satisfaction);
         assert!(sol.is_some());
         debug!("Proposed solution by solver: {:?}", sol);
         assert!(sol.unwrap().len() == 4);

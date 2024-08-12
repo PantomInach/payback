@@ -2,9 +2,9 @@ use log::debug;
 use petgraph::{dot::Dot, graph::DiGraph, graph::NodeIndex};
 use std::collections::HashMap;
 
-use crate::approximation::{GreedySatisfaction, StarExpand};
+use crate::approximation::{greedy_satisfaction, star_expand};
+use crate::exact_partitioning::naive_all_partitioning;
 use crate::graph::{Edge, Graph, NamedNode};
-use crate::solver::{Solver, SolverApproximation, SolverPartitioning};
 
 #[cfg(windows)]
 const LINE_ENDING: &str = "\r\n";
@@ -59,17 +59,11 @@ impl ProblemInstance {
 
     pub(crate) fn solve_with(&self, method: SolvingMethods) -> Solution {
         match method {
-            SolvingMethods::ApproxStarExpand => {
-                <dyn SolverApproximation<StarExpand> as Solver>::solve(self)
-            }
-            SolvingMethods::ApproxGreedySatisfaction => {
-                <dyn SolverApproximation<GreedySatisfaction> as Solver>::solve(self)
-            }
-            SolvingMethods::PartitioningStarExpand => {
-                <dyn SolverPartitioning<StarExpand> as Solver>::solve(self)
-            }
+            SolvingMethods::ApproxStarExpand => star_expand(self),
+            SolvingMethods::ApproxGreedySatisfaction => greedy_satisfaction(self),
+            SolvingMethods::PartitioningStarExpand => naive_all_partitioning(self, &star_expand),
             SolvingMethods::PartitioningGreedySatisfaction => {
-                <dyn SolverPartitioning<GreedySatisfaction> as Solver>::solve(self)
+                naive_all_partitioning(self, &greedy_satisfaction)
             }
         }
     }

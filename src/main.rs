@@ -9,7 +9,6 @@ pub mod exact_partitioning;
 pub mod graph;
 pub mod graph_parser;
 pub mod probleminstance;
-pub mod solver;
 
 /// Calculate to resolve debt networks with as few transactions as possible.
 ///

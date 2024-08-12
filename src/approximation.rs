@@ -3,118 +3,108 @@ use std::collections::HashMap;
 
 use crate::graph::{Edge, NamedNode};
 use crate::probleminstance::{ProblemInstance, Solution};
-use crate::solver::SolverApproximation;
 
-pub(crate) trait ApproxomationScheme {}
-
-pub(crate) struct StarExpand {}
-pub(crate) struct GreedySatisfaction {}
-
-impl ApproxomationScheme for StarExpand {}
-impl ApproxomationScheme for GreedySatisfaction {}
-
-impl SolverApproximation<StarExpand> for ProblemInstance {
-    fn solve_approx(&self) -> Solution {
-        debug!("Running 'star_expand' for graph: {:?}", self.g.to_string());
-        if !self.is_solvable() {
-            None
-        } else {
-            let mut total_transaction_amount = 0;
-            let v_max: Option<&NamedNode> = self.g.vertices.iter().max();
-            match v_max {
-                None => None,
-                Some(v) => {
-                    let edges: HashMap<Edge, f64> = self
-                        .g
-                        .vertices
-                        .iter()
-                        .filter(|u| u != &v)
-                        .map(|u| {
-                            total_transaction_amount += u.weight.abs();
-                            if u.weight > 0 {
-                                (Edge { u: u.id, v: v.id }, u.weight as f64)
-                            } else {
-                                (Edge { u: v.id, v: u.id }, -u.weight as f64)
-                            }
-                        })
-                        .collect();
-                    debug!(
-                        "Caculated Approximation for graph {:?} with edges {:?}",
-                        self.g.to_string(),
-                        edges
-                    );
-                    debug!(
-                        "The total amount of transactions is: {:?}\nVS Optimum: {:?}",
-                        total_transaction_amount,
-                        self.optimal_transaction_amount()
-                    );
-                    Some(edges)
-                }
+pub(crate) fn star_expand(instance: &ProblemInstance) -> Solution {
+    debug!(
+        "Running 'star_expand' for graph: {:?}",
+        instance.g.to_string()
+    );
+    if !instance.is_solvable() {
+        None
+    } else {
+        let mut total_transaction_amount = 0;
+        let v_max: Option<&NamedNode> = instance.g.vertices.iter().max();
+        match v_max {
+            None => None,
+            Some(v) => {
+                let edges: HashMap<Edge, f64> = instance
+                    .g
+                    .vertices
+                    .iter()
+                    .filter(|u| u != &v)
+                    .map(|u| {
+                        total_transaction_amount += u.weight.abs();
+                        if u.weight > 0 {
+                            (Edge { u: u.id, v: v.id }, u.weight as f64)
+                        } else {
+                            (Edge { u: v.id, v: u.id }, -u.weight as f64)
+                        }
+                    })
+                    .collect();
+                debug!(
+                    "Caculated Approximation for graph {:?} with edges {:?}",
+                    instance.g.to_string(),
+                    edges
+                );
+                debug!(
+                    "The total amount of transactions is: {:?}\nVS Optimum: {:?}",
+                    total_transaction_amount,
+                    instance.optimal_transaction_amount()
+                );
+                Some(edges)
             }
         }
     }
 }
 
-impl SolverApproximation<GreedySatisfaction> for ProblemInstance {
-    fn solve_approx(&self) -> Solution {
-        debug!(
-            "Running 'greedy_satisfaction' for graph: {:?}",
-            self.g.to_string()
-        );
-        if !self.is_solvable() {
-            None
-        } else {
-            let mut sol = HashMap::new();
-            let (mut neg_vertices, mut pos_vertices): (Vec<&NamedNode>, Vec<&NamedNode>) =
-                self.g.vertices.iter().partition(|v| v.weight < 0_i64);
-            let mut side_capacities = 0;
-            if let Some(x) = neg_vertices.first() {
+pub(crate) fn greedy_satisfaction(instance: &ProblemInstance) -> Solution {
+    debug!(
+        "Running 'greedy_satisfaction' for graph: {:?}",
+        instance.g.to_string()
+    );
+    if !instance.is_solvable() {
+        None
+    } else {
+        let mut sol = HashMap::new();
+        let (mut neg_vertices, mut pos_vertices): (Vec<&NamedNode>, Vec<&NamedNode>) =
+            instance.g.vertices.iter().partition(|v| v.weight < 0_i64);
+        let mut side_capacities = 0;
+        if let Some(x) = neg_vertices.first() {
+            side_capacities = x.weight;
+        }
+        if let Some(x) = pos_vertices.first() {
+            if x.weight > side_capacities.abs() {
                 side_capacities = x.weight;
             }
-            if let Some(x) = pos_vertices.first() {
-                if x.weight > side_capacities.abs() {
-                    side_capacities = x.weight;
-                }
-            }
-            while !neg_vertices.is_empty() && !pos_vertices.is_empty() {
-                let n = neg_vertices.first().unwrap();
-                let p = pos_vertices.first().unwrap();
-                match side_capacities.cmp(&0_i64) {
-                    std::cmp::Ordering::Less => {
-                        if p.weight <= -side_capacities {
-                            sol.insert(Edge { u: p.id, v: n.id }, p.weight as f64);
-                            side_capacities += p.weight;
-                            if side_capacities == 0 {
-                                neg_vertices.remove(0);
-                            }
-                            pos_vertices.remove(0);
-                        } else {
-                            sol.insert(Edge { u: p.id, v: n.id }, side_capacities as f64);
-                            side_capacities += p.weight;
-                            neg_vertices.remove(0);
-                        }
-                    }
-                    std::cmp::Ordering::Equal => {
-                        side_capacities = p.weight;
-                    }
-                    std::cmp::Ordering::Greater => {
-                        if -n.weight <= side_capacities {
-                            sol.insert(Edge { u: p.id, v: n.id }, n.weight.abs() as f64);
-                            side_capacities += n.weight;
-                            if side_capacities == 0 {
-                                pos_vertices.remove(0);
-                            }
-                            neg_vertices.remove(0);
-                        } else {
-                            sol.insert(Edge { u: p.id, v: n.id }, side_capacities as f64);
-                            side_capacities += n.weight;
-                            pos_vertices.remove(0);
-                        }
-                    }
-                }
-            }
-            Some(sol)
         }
+        while !neg_vertices.is_empty() && !pos_vertices.is_empty() {
+            let n = neg_vertices.first().unwrap();
+            let p = pos_vertices.first().unwrap();
+            match side_capacities.cmp(&0_i64) {
+                std::cmp::Ordering::Less => {
+                    if p.weight <= -side_capacities {
+                        sol.insert(Edge { u: p.id, v: n.id }, p.weight as f64);
+                        side_capacities += p.weight;
+                        if side_capacities == 0 {
+                            neg_vertices.remove(0);
+                        }
+                        pos_vertices.remove(0);
+                    } else {
+                        sol.insert(Edge { u: p.id, v: n.id }, side_capacities as f64);
+                        side_capacities += p.weight;
+                        neg_vertices.remove(0);
+                    }
+                }
+                std::cmp::Ordering::Equal => {
+                    side_capacities = p.weight;
+                }
+                std::cmp::Ordering::Greater => {
+                    if -n.weight <= side_capacities {
+                        sol.insert(Edge { u: p.id, v: n.id }, n.weight.abs() as f64);
+                        side_capacities += n.weight;
+                        if side_capacities == 0 {
+                            pos_vertices.remove(0);
+                        }
+                        neg_vertices.remove(0);
+                    } else {
+                        sol.insert(Edge { u: p.id, v: n.id }, side_capacities as f64);
+                        side_capacities += n.weight;
+                        pos_vertices.remove(0);
+                    }
+                }
+            }
+        }
+        Some(sol)
     }
 }
 
@@ -122,12 +112,11 @@ impl SolverApproximation<GreedySatisfaction> for ProblemInstance {
 mod tests {
     use std::collections::HashMap;
 
-    use crate::approximation::GreedySatisfaction;
-    use crate::approximation::StarExpand;
+    use crate::approximation::greedy_satisfaction;
+    use crate::approximation::star_expand;
     use crate::graph::Edge;
     use crate::graph::Graph;
     use crate::probleminstance::ProblemInstance;
-    use crate::solver::SolverApproximation;
     use env_logger::Env;
     use log::debug;
 
@@ -150,7 +139,7 @@ mod tests {
         .into();
         let graph_string = graph.to_string();
         let instance: ProblemInstance = graph.into();
-        let sol = SolverApproximation::<StarExpand>::solve_approx(&instance);
+        let sol = star_expand(&instance);
         debug!(
             "For graph '{:?}' star_expand returns: {:?}",
             graph_string, sol
@@ -166,7 +155,7 @@ mod tests {
         .into();
         let graph_string = graph.to_string();
         let instance: ProblemInstance = graph.clone().into();
-        let sol_opt = SolverApproximation::<StarExpand>::solve_approx(&instance);
+        let sol_opt = star_expand(&instance);
         debug!(
             "For graph '{:?}' star_expand returns: {:?}",
             graph_string, sol
@@ -214,7 +203,7 @@ mod tests {
         .into();
         let graph_string = graph.to_string();
         let instance: ProblemInstance = graph.into();
-        let sol = SolverApproximation::<GreedySatisfaction>::solve_approx(&instance);
+        let sol = greedy_satisfaction(&instance);
         debug!(
             "For graph '{:?}' greedy_satisfaction returns: {:?}",
             graph_string, sol
@@ -230,7 +219,7 @@ mod tests {
         .into();
         let graph_string = graph.to_string();
         let instance: ProblemInstance = graph.into();
-        let sol = SolverApproximation::<GreedySatisfaction>::solve_approx(&instance);
+        let sol = greedy_satisfaction(&instance);
         debug!(
             "For graph '{:?}' greedy_satisfaction returns: {:?}",
             graph_string, sol

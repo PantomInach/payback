@@ -27,7 +27,12 @@ pub(crate) struct Graph {
 
 impl Ord for NamedNode {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.partial_cmp(other).unwrap_or(std::cmp::Ordering::Equal)
+        match (self.weight, other.weight) {
+            (u, v) if u > v => std::cmp::Ordering::Greater,
+            (u, v) if u == v => std::cmp::Ordering::Equal,
+            (u, v) if u < v => std::cmp::Ordering::Less,
+            (_, _) => unreachable!(),
+        }
     }
 }
 

@@ -12,7 +12,7 @@ const LINE_ENDING: &str = "\r\n";
 #[cfg(not(windows))]
 const LINE_ENDING: &str = "\n";
 
-pub(crate) type Solution = Option<HashMap<Edge, f64>>;
+pub type Solution = Option<HashMap<Edge, f64>>;
 
 #[derive(Copy, Clone, Debug, clap::ValueEnum)]
 pub enum SolvingMethods {
@@ -32,7 +32,7 @@ pub enum SolvingMethods {
     BranchingPartitionGreedySatisfaction,
 }
 
-pub(crate) struct ProblemInstance {
+pub struct ProblemInstance {
     pub(crate) g: Graph,
 }
 
@@ -48,7 +48,7 @@ impl ProblemInstance {
         ProblemInstance { g: graph }
     }
 
-    pub(crate) fn is_solvable(&self) -> bool {
+    pub fn is_solvable(&self) -> bool {
         let avg = self.g.get_average_vertex_weight();
         if self.g.get_average_vertex_weight() != 0_f64 {
             debug!(
@@ -62,7 +62,7 @@ impl ProblemInstance {
         }
     }
 
-    pub(crate) fn solve_with(&self, method: SolvingMethods) -> Solution {
+    pub fn solve_with(&self, method: SolvingMethods) -> Solution {
         match method {
             SolvingMethods::ApproxStarExpand => star_expand(self),
             SolvingMethods::ApproxGreedySatisfaction => greedy_satisfaction(self),
@@ -81,7 +81,7 @@ impl ProblemInstance {
         self.g.vertices.iter().map(|v| v.weight.abs()).sum()
     }
 
-    pub(crate) fn solution_string(&self, solution: &Solution) -> Result<String, String> {
+    pub fn solution_string(&self, solution: &Solution) -> Result<String, String> {
         match solution {
             None => Err("No result was found.".to_string()),
             Some(map) => {
@@ -101,7 +101,7 @@ impl ProblemInstance {
         }
     }
 
-    pub(crate) fn solution_to_dot_string(&self, solution: &Solution) -> Result<String, String> {
+    pub fn solution_to_dot_string(&self, solution: &Solution) -> Result<String, String> {
         match solution {
             None => {
                 println!("No result was found.");

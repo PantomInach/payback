@@ -83,80 +83,39 @@ Here the nodes are named `A`, `B`, `C`, `D`.
 
 ## Solving
 Available solver:
-| Solver | Type | Description |
-| --- | --- | --- |
-| Star Expand | 2 Approximation | Approximates optimal solution by choosing central node, to which all edges are incident. |
-| Greedy Satisfaction | 2 Approximation | Approximates optimal solution while minimizing the total weight of all edges. |
-| Partitioning with Star Expand | Exact | Partitioning based exact solver, which solves base cases with Star Expand. |
-| Partitioning with Greedy Satisfaction | Exact | Partitioning based exact solver, which solves base cases with Greedy Satisfaction. |
+| Solver | Type | SolvingMethods | Description |
+| --- | --- | --- | --- |
+| Star Expand | 2 Approximation | StarExpand | Approximates optimal solution by choosing central node, to which all edges are incident. |
+| Greedy Satisfaction | 2 Approximation | GreedySatisfaction |Approximates optimal solution while minimizing the total weight of all edges. |
+| Partitioning with Star Expand | Exact | PartitioningStarExpand |Partitioning based exact solver, which solves base cases with Star Expand. |
+| Partitioning with Greedy Satisfaction | Exact | PartitioningGreedySatisfaction | Partitioning based exact solver, which solves base cases with Greedy Satisfaction. |
+| BestPartition with Star Expand | Exact | Branching | BranchingPartitionStarExpand | based exact solver with a runtime of O^*(3^n), which solves base cases with Star Expand. |
+| BestPartition with Greedy Satisfaction | Exact | BranchingPartitionGreedySatisfaction | Branching based exact solver with a runtime of O^*(3^n), which solves base cases with Greedy Satisfaction. |
 
 Approximation algorithm don't necessarily return the optimal solution but theirs is not worse than a given factor. Also, they run in polynomial time.
 
 Exact algorithm give the optimal solution, but its runtime is not polynomial. This can lead to long runtimes while working with larger inputs. Generally it is uncommon to have an instance, for which an approximation algorithm does not return the optimal answer.
 
-### Using Star Expand
-Solve the instance and print the transactions.
+### Using the Library
+Solve the instance and get a solution as string.
 ```rust
-let instance = ProblemInstance::from(graph);
-let sol = <dyn SolverApproximation::<StarExpand> as Solver>::solve(&instance);
-instance.print_solution(&sol);
+use payback::graph::Graph;
+use payback::probleminstance::{ProblemInstance, Solution, SolvingMethods};
+                                                                                            
+let instance: ProblemInstance = Graph::from(vec![-2, -1, 1, 2]).into();
+let solution: Solution = instance.solve_with(SolvingMethods::StarExpand);
+let result: Result<String, String> = instance.solution_string(&solution);
 ```
 Solve the instance and print a [dot](https://graphviz.org/docs/layouts/dot/) string for graph visualization with [graphviz](https://graphviz.org).
 ```rust
-use payback::SolvingMethods::ApproxStarExpand;
-
-let instance = ProblemInstance::from(graph);
-let sol = instance.solve_with(ApproxStarExpand);
-instance.solution_to_dot_string(&sol);
+use payback::graph::Graph;
+use payback::probleminstance::{ProblemInstance, Solution, SolvingMethods};
+                                                                                            
+let instance: ProblemInstance = Graph::from(vec![-2, -1, 1, 2]).into();
+let solution: Solution = instance.solve_with(SolvingMethods::StarExpand);
+let result: Result<String, String> = instance.solution_to_dot_string(&solution);
 ```
-
-### Using Greedy Satisfaction 
-Solve the instance and print the transactions.
-```rust
-let instance = ProblemInstance::from(graph);
-let sol = <dyn SolverApproximation::<GreedySatisfaction> as Solver>::solve(&instance);
-instance.print_solution(&sol);
-```
-Solve the instance and print a [dot](https://graphviz.org/docs/layouts/dot/) string for graph visualization with [graphviz](https://graphviz.org).
-```rust
-use payback::SolvingMethods::ApproxGreedySatisfaction;
-
-let instance = ProblemInstance::from(graph);
-let sol = instance.solve_with(ApproxGreedySatisfaction);
-instance.solution_to_dot_string(&sol);
-```
-
-### Using Partitioning with Star Expand
-Solve the instance and print the transactions.
-```rust
-let instance = ProblemInstance::from(graph);
-let sol = <dyn SolverPartitioning::<StarExpand> as Solver>::solve(&instance);
-instance.print_solution(&sol);
-```
-Solve the instance and print a [dot](https://graphviz.org/docs/layouts/dot/) string for graph visualization with [graphviz](https://graphviz.org).
-```rust
-use payback::SolvingMethods::PartitioningStarExpand;
-
-let instance = ProblemInstance::from(graph);
-let sol = instance.solve_with(PartitioningsStarExpand);
-instance.solution_to_dot_string(&sol);
-```
-
-### Using Partitioning with Greedy Satisfaction
-Solve the instance and print the transactions.
-```rust
-let instance = ProblemInstance::from(graph);
-let sol = <dyn SolverPartitioning::<GreedySatisfaction> as Solver>::solve(&instance);
-instance.print_solution(&sol);
-```
-Solve the instance and print a [dot](https://graphviz.org/docs/layouts/dot/) string for graph visualization with [graphviz](https://graphviz.org).
-```rust
-use payback::SolvingMethods::PartitioningsGreedySatisfaction;
-
-let instance = ProblemInstance::from(graph);
-let sol = instance.solve_with(PartitioningsGreedySatisfaction);
-instance.solution_to_dot_string(&sol);
-```
+You can also choose another solving method than `SolvingMethods::StarExpand`. See [Solving](#solving) for more options.
 
 # Usage as CLI
 

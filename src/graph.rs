@@ -7,20 +7,20 @@ use std::iter::zip;
 use crate::graph_parser::deserialize_string_to_graph;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub(crate) struct NamedNode {
+pub struct NamedNode {
     pub(crate) id: usize,
     pub(crate) name: String,
     pub(crate) weight: i64,
 }
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
-pub(crate) struct Edge {
+pub struct Edge {
     pub(crate) u: usize,
     pub(crate) v: usize,
 }
 
 #[derive(Clone, Debug)]
-pub(crate) struct Graph {
+pub struct Graph {
     pub(crate) vertices: Vec<NamedNode>,
     pub(crate) edges: Vec<Edge>,
 }

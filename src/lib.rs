@@ -1,6 +1,6 @@
-pub mod approximation;
-pub mod exact_partitioning;
+mod approximation;
+mod exact_partitioning;
 pub mod graph;
-pub mod graph_parser;
+mod graph_parser;
 pub mod probleminstance;
-pub mod tree_bases;
+mod tree_bases;

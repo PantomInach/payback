@@ -4,22 +4,22 @@ use crate::graph::{Edge, Graph, NamedNode};
 use crate::probleminstance::{ProblemInstance, Solution};
 use itertools::Itertools;
 
-/**
- * Algorithm 1 Exponential time algorithm for finding best zero-sum set packing
- * 1: procedure BestPartition(subset, debts)
- * 2:   subset ← subset of vertices I’m looking at
- * 3:   debts ← array of debt values
- * 4:   return ← the best partitioning of subset
- * 5: Base Case:
- * 6:   if susbet is empty then return [ ]
- * 7: Recursive Case:
- * 8:   solutions ← [ ]
- * 9:   for s ⊆ subset and 3 ≤ |s| ≤ len(subset)/2 do
- * 10:      if subset is valid (has sum 0) then
- * 11:          solutions.append ← [s] + BestPartition(subset − s, debts)
- * 12:  return element in solutions with the largest length.
- */
-fn best_partition(
+/// Algorithm solving the payback problem via a branching based approach.
+///
+///
+/// * `instance` - The problem instance which should be solved
+/// * `approx_solver` - Approximation algorithm used to solve partition, which have no zero sum
+/// subset
+///
+/// Example:
+/// ```
+/// use payback::graph::Graph;
+/// use payback::probleminstance::{ProblemInstance, Solution, SolvingMethods};
+///
+/// let instance: ProblemInstance = Graph::from(vec![-2, -1, 1, 2]).into();
+/// let solution: Solution = instance.solve_with(SolvingMethods::BranchingPartitionStarExpand);
+/// ```
+pub(crate) fn best_partition(
     instance: &ProblemInstance,
     approx_solver: &dyn Fn(&ProblemInstance) -> Solution,
 ) -> Solution {
@@ -122,5 +122,11 @@ mod tests {
         assert!(sol.is_some());
         debug!("Proposed solution by solver: {:?}", sol);
         assert!(sol.unwrap().len() == 4);
+
+        let graph: Graph = vec![-2, -1, 1, 1, 2, -2, 3, -3].into();
+        debug!("Using graph: {:?}", graph);
+        let instance = ProblemInstance::from(graph);
+        let sol = best_partition(&instance, &star_expand);
+        assert!(sol.is_none());
     }
 }

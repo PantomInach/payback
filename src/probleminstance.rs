@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use crate::approximation::{greedy_satisfaction, star_expand};
 use crate::exact_partitioning::naive_all_partitioning;
 use crate::graph::{Edge, Graph, NamedNode};
+use crate::tree_bases::best_partition;
 
 #[cfg(windows)]
 const LINE_ENDING: &str = "\r\n";
@@ -14,7 +15,7 @@ const LINE_ENDING: &str = "\n";
 pub(crate) type Solution = Option<HashMap<Edge, f64>>;
 
 #[derive(Copy, Clone, Debug, clap::ValueEnum)]
-pub(crate) enum SolvingMethods {
+pub enum SolvingMethods {
     /// 2-Approximation schema with one high responsibility node.
     /// Doesn't necessarily return minimal edge weight sum.
     ApproxStarExpand,
@@ -25,6 +26,10 @@ pub(crate) enum SolvingMethods {
     /// Excat partitioning based solving algorithmus, which solves partitions with
     /// 'GreedySatisfaction'.
     PartitioningGreedySatisfaction,
+    /// Branching based algorithm running in O*(3^n) time, which solves partitions with 'StarExpand'.
+    BranchingPartitionStarExpand,
+    /// Branching based algorithm running in O*(3^n) time, which solves partitions with 'GreedySatisfaction'.
+    BranchingPartitionGreedySatisfaction,
 }
 
 pub(crate) struct ProblemInstance {
@@ -64,6 +69,10 @@ impl ProblemInstance {
             SolvingMethods::PartitioningStarExpand => naive_all_partitioning(self, &star_expand),
             SolvingMethods::PartitioningGreedySatisfaction => {
                 naive_all_partitioning(self, &greedy_satisfaction)
+            }
+            SolvingMethods::BranchingPartitionStarExpand => best_partition(self, &star_expand),
+            SolvingMethods::BranchingPartitionGreedySatisfaction => {
+                best_partition(self, &greedy_satisfaction)
             }
         }
     }

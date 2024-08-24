@@ -18,16 +18,18 @@ pub type Solution = Option<HashMap<Edge, f64>>;
 #[derive(Copy, Clone, Debug, clap::ValueEnum)]
 pub enum SolvingMethods {
     /// 2-Approximation schema with one high responsibility node.
-    /// Doesn't necessarily return minimal edge weight sum.
+    /// Doesn't necessarily return minimal total transaction amount possible.
     ApproxStarExpand,
     /// 2-Approximation schema with minimal edge weight sum.
     ApproxGreedySatisfaction,
     /// Excat partitioning based solving algorithmus, which solves partitions with 'StarExpand'.
+    /// Doesn't necessarily return minimal total transaction amount possible.
     PartitioningStarExpand,
     /// Excat partitioning based solving algorithmus, which solves partitions with
     /// 'GreedySatisfaction'.
     PartitioningGreedySatisfaction,
     /// Branching based algorithm running in O*(3^n) time, which solves partitions with 'StarExpand'.
+    /// Doesn't necessarily return minimal total transaction amount possible.
     BranchingPartitionStarExpand,
     /// Branching based algorithm running in O*(3^n) time, which solves partitions with 'GreedySatisfaction'.
     BranchingPartitionGreedySatisfaction,
@@ -56,7 +58,7 @@ impl ProblemInstance {
 
     pub fn is_solvable(&self) -> bool {
         let avg = self.g.get_average_vertex_weight();
-        if self.g.get_average_vertex_weight() != 0_f64 {
+        if avg != 0_f64 {
             debug!(
                 "Graph {:?} has not the average weight {:?}. Should be 0",
                 self.g.to_string(),
@@ -86,7 +88,7 @@ impl ProblemInstance {
     }
 
     pub(crate) fn optimal_transaction_amount(&self) -> i64 {
-        self.g.vertices.iter().map(|v| v.weight.abs()).sum()
+        self.g.vertices.iter().map(|v| v.weight.abs()).sum::<i64>() / 2
     }
 
     pub fn solution_string(&self, solution: &Solution) -> Result<String, String> {

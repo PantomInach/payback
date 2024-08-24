@@ -37,7 +37,7 @@ pub(crate) fn star_expand(instance: &ProblemInstance) -> Solution {
                     edges
                 );
                 debug!(
-                    "The total amount of transactions is: {:?}\nVS Optimum: {:?}",
+                    "The total amount of transactions is: {:?} VS Optimum: {:?}",
                     total_transaction_amount,
                     instance.optimal_transaction_amount()
                 );

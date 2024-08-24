@@ -5,6 +5,21 @@ use std::collections::HashMap;
 use crate::graph::{Edge, Graph, NamedNode};
 use crate::probleminstance::{ProblemInstance, Solution};
 
+/// Algorithm solving the payback problem naivly by iteration all possible partitionings of the
+/// vertices. Has a runtime of O^*(n^n / (ln n)^n). Should not be used.
+///
+/// * `instance` - The problem instance which should be solved
+/// * `approx_solver` - Approximation algorithm used to solve partition, which have no zero sum
+/// subset
+///
+/// Example:
+/// ```
+/// use payback::graph::Graph;
+/// use payback::probleminstance::{ProblemInstance, Solution, SolvingMethods};
+///
+/// let instance: ProblemInstance = Graph::from(vec![-2, -1, 1, 2]).into();
+/// let solution: Solution = instance.solve_with(SolvingMethods::PartitioningStarExpand);
+/// ```
 pub(crate) fn naive_all_partitioning(
     instance: &ProblemInstance,
     approx_solver: &dyn Fn(&ProblemInstance) -> Solution,
@@ -80,7 +95,7 @@ where
 mod tests {
     use std::collections::HashSet;
 
-    use crate::approximation::greedy_satisfaction;
+    use crate::approximation::{greedy_satisfaction, star_expand};
     use crate::exact_partitioning::collect_all_partitionigns;
     use crate::exact_partitioning::naive_all_partitioning;
     use crate::graph::Graph;
@@ -105,6 +120,22 @@ mod tests {
         assert!(sol.is_some());
         debug!("Proposed solution by solver: {:?}", sol);
         assert!(sol.unwrap().len() == 4);
+
+        let graph: Graph = vec![6, 3, 2, 1, -4, -8].into();
+        debug!("Using graph: {:?}", graph);
+        let instance = ProblemInstance::from(graph);
+        let sol = naive_all_partitioning(&instance, &star_expand);
+        assert!(sol.is_some());
+        debug!("Proposed solution by solver: {:?}", sol);
+        assert_eq!(sol.unwrap().len(), 4);
+
+        let graph: Graph = vec![6, 3, 2, 1, -4, -8, 0].into();
+        debug!("Using graph: {:?}", graph);
+        let instance = ProblemInstance::from(graph);
+        let sol = naive_all_partitioning(&instance, &star_expand);
+        assert!(sol.is_some());
+        debug!("Proposed solution by solver: {:?}", sol);
+        assert_eq!(sol.unwrap().len(), 4);
     }
 
     #[test]

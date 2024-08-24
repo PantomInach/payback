@@ -5,6 +5,7 @@ use graph::Graph;
 use probleminstance::{ProblemInstance, SolvingMethods};
 
 pub mod approximation;
+pub mod dynamic_program;
 pub mod exact_partitioning;
 pub mod graph;
 pub mod graph_parser;

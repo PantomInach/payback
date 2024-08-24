@@ -3,6 +3,7 @@ use petgraph::{dot::Dot, graph::DiGraph, graph::NodeIndex};
 use std::collections::HashMap;
 
 use crate::approximation::{greedy_satisfaction, star_expand};
+use crate::dynamic_program::patcas_dp;
 use crate::exact_partitioning::naive_all_partitioning;
 use crate::graph::{Edge, Graph, NamedNode};
 use crate::tree_bases::best_partition;
@@ -30,6 +31,11 @@ pub enum SolvingMethods {
     BranchingPartitionStarExpand,
     /// Branching based algorithm running in O*(3^n) time, which solves partitions with 'GreedySatisfaction'.
     BranchingPartitionGreedySatisfaction,
+    /// Dynamic program with a runtime of O*(3^n), which solves partitions with 'StarExpand'.
+    /// Doesn't necessarily return minimal total transaction amount possible.
+    DPStarExpand,
+    /// Dynamic program with a runtime of O*(3^n), which solves partitions with 'GreedySatisfaction'.
+    DPGreedySatisfaction,
 }
 
 pub struct ProblemInstance {
@@ -74,6 +80,8 @@ impl ProblemInstance {
             SolvingMethods::BranchingPartitionGreedySatisfaction => {
                 best_partition(self, &greedy_satisfaction)
             }
+            SolvingMethods::DPStarExpand => patcas_dp(self, &star_expand),
+            SolvingMethods::DPGreedySatisfaction => patcas_dp(self, &greedy_satisfaction),
         }
     }
 

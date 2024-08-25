@@ -4,6 +4,24 @@ use std::collections::HashMap;
 use crate::graph::{Edge, NamedNode};
 use crate::probleminstance::{ProblemInstance, Solution};
 
+/// Algorithm approximating the payback problem by building a tree.
+/// Has a approximation factor of 2. The proposed solution has at most twice as many edges as the
+/// optimum.
+/// Does NOT necessarily return the solution with a minimal total transaction amount.
+/// The algorithm has a linear runtime.
+///
+/// * `instance` - The problem instance which should be solved
+/// * `approx_solver` - Approximation algorithm used to solve partition, which have no zero sum
+/// subset
+///
+/// Example:
+/// ```
+/// use payback::graph::Graph;
+/// use payback::probleminstance::{ProblemInstance, Solution, SolvingMethods};
+///
+/// let instance: ProblemInstance = Graph::from(vec![-2, -1, 1, 2]).into();
+/// let solution: Solution = instance.solve_with(SolvingMethods::StarExpand);
+/// ```
 pub(crate) fn star_expand(instance: &ProblemInstance) -> Solution {
     debug!(
         "Running 'star_expand' for graph: {:?}",
@@ -47,6 +65,24 @@ pub(crate) fn star_expand(instance: &ProblemInstance) -> Solution {
     }
 }
 
+/// Algorithm approximating the payback problem by greedily building edges in a bipartite graph.
+/// Has a approximation factor of 2. The proposed solution has at most twice as many edges as the
+/// optimum.
+/// Returns a solution with minimal total transaction amount.
+/// The algorithm has a linear runtime.
+///
+/// * `instance` - The problem instance which should be solved
+/// * `approx_solver` - Approximation algorithm used to solve partition, which have no zero sum
+/// subset
+///
+/// Example:
+/// ```
+/// use payback::graph::Graph;
+/// use payback::probleminstance::{ProblemInstance, Solution, SolvingMethods};
+///
+/// let instance: ProblemInstance = Graph::from(vec![-2, -1, 1, 2]).into();
+/// let solution: Solution = instance.solve_with(SolvingMethods::StarExpand);
+/// ```
 pub(crate) fn greedy_satisfaction(instance: &ProblemInstance) -> Solution {
     debug!(
         "Running 'greedy_satisfaction' for graph: {:?}",

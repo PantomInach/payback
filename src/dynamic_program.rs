@@ -12,6 +12,7 @@ type Table = HashMap<(u128, u128), (usize, Option<(u128, u128)>)>;
 
 /// Algorithm solving the payback problem via a dynamic program.
 /// Based on algorithm by [Patcas](https://www.cs.ubbcluj.ro/~studia-i/contents/2009-2/10-Patcas.pdf).
+/// The algorithm has a runtime of O^*(3^n).
 ///
 /// * `instance` - The problem instance which should be solved
 /// * `approx_solver` - Approximation algorithm used to solve partition, which have no zero sum

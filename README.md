@@ -89,10 +89,10 @@ Available solver:
 | Greedy Satisfaction | 2 Approximation | GreedySatisfaction |Approximates optimal solution while minimizing the total weight of all edges. |
 | Partitioning with Star Expand | Exact | PartitioningStarExpand |Partitioning based exact solver, which solves base cases with Star Expand. |
 | Partitioning with Greedy Satisfaction | Exact | PartitioningGreedySatisfaction | Partitioning based exact solver, which solves base cases with Greedy Satisfaction. |
-| BestPartition with Star Expand | Exact | BranchingPartitionStarExpand | Branching based exact solver with a runtime of O^*(3^n), which solves base cases with Star Expand. |
-| BestPartition with Greedy Satisfaction | Exact | BranchingPartitionGreedySatisfaction | Branching based exact solver with a runtime of O^*(3^n), which solves base cases with Greedy Satisfaction. |
-| Dynamic Program with Star Expand | Exact | Solver using dynamic programming technic with a runtime of O^*(3^n), which solves bases cases with Start Expand |
-| Dynamic Program with Star Expand | Exact | Solver using dynamic programming technic with a runtime of O^*(3^n), which solves bases cases with Greedy Satisfaction |
+| BestPartition with Star Expand | Exact | BranchingPartitionStarExpand | Branching based exact solver with a runtime of O*(3^n), which solves base cases with Star Expand. |
+| BestPartition with Greedy Satisfaction | Exact | BranchingPartitionGreedySatisfaction | Branching based exact solver with a runtime of O*(3^n), which solves base cases with Greedy Satisfaction. |
+| Dynamic Program with Star Expand | Exact | DPStarExpand | Solver using dynamic programming technic with a runtime of O*(3^n), which solves bases cases with Start Expand |
+| Dynamic Program with Star Expand | Exact | DPGreedySatisfaction | Solver using dynamic programming technic with a runtime of O*(3^n), which solves bases cases with Greedy Satisfaction |
 
 Approximation algorithm don't necessarily return the optimal solution but theirs is not worse than a given factor. Also, they run in polynomial time.
 

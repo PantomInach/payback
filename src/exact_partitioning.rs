@@ -6,7 +6,7 @@ use crate::graph::{Edge, Graph, NamedNode};
 use crate::probleminstance::{ProblemInstance, Solution};
 
 /// Algorithm solving the payback problem naivly by iteration all possible partitionings of the
-/// vertices. Has a runtime of O^*(n^n / (ln n)^n). Should not be used.
+/// vertices. Has a runtime of O*(n^n / (ln n)^n). Should not be used.
 ///
 /// * `instance` - The problem instance which should be solved
 /// * `approx_solver` - Approximation algorithm used to solve partition, which have no zero sum

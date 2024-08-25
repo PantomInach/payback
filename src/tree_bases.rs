@@ -6,7 +6,7 @@ use itertools::Itertools;
 use log::debug;
 
 /// Algorithm solving the payback problem via a branching based approach.
-/// Has a runtime of O^*(3^n).
+/// Has a runtime of O*(3^n).
 ///
 ///
 /// * `instance` - The problem instance which should be solved

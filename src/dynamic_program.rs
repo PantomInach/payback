@@ -298,5 +298,21 @@ mod tests {
         assert!(sol.is_some());
         debug!("Proposed solution by solver: {:?}", sol);
         assert_eq!(sol.unwrap().len(), 4);
+
+        let graph: Graph = vec![1, 1, 1, 1, 1, 1, -6].into();
+        debug!("Using graph: {:?}", graph);
+        let instance = ProblemInstance::from(graph);
+        let sol = patcas_dp(&instance, &star_expand);
+        assert!(sol.is_some());
+        debug!("Proposed solution by solver: {:?}", sol);
+        assert_eq!(sol.unwrap().len(), 6);
+
+        let graph: Graph = vec![9, 4, 1, -6, -6, -2].into();
+        debug!("Using graph: {:?}", graph);
+        let instance = ProblemInstance::from(graph);
+        let sol = patcas_dp(&instance, &star_expand);
+        assert!(sol.is_some());
+        debug!("Proposed solution by solver: {:?}", sol);
+        assert_eq!(sol.unwrap().len(), 5);
     }
 }

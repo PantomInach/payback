@@ -110,7 +110,7 @@ mod tests {
     }
 
     #[test]
-    fn test_perfect_matching_sol() {
+    fn test_naive_all_partitioning() {
         init();
         debug!("Running 'test_perfect_matching_sol'");
         let graph: Graph = vec![-1, -1, 1, 1, 2, -2, 3, -3].into();
@@ -136,6 +136,22 @@ mod tests {
         assert!(sol.is_some());
         debug!("Proposed solution by solver: {:?}", sol);
         assert_eq!(sol.unwrap().len(), 4);
+
+        let graph: Graph = vec![1, 1, 1, 1, 1, 1, -6].into();
+        debug!("Using graph: {:?}", graph);
+        let instance = ProblemInstance::from(graph);
+        let sol = naive_all_partitioning(&instance, &star_expand);
+        assert!(sol.is_some());
+        debug!("Proposed solution by solver: {:?}", sol);
+        assert_eq!(sol.unwrap().len(), 6);
+
+        let graph: Graph = vec![9, 4, 1, -6, -6, -2].into();
+        debug!("Using graph: {:?}", graph);
+        let instance = ProblemInstance::from(graph);
+        let sol = naive_all_partitioning(&instance, &star_expand);
+        assert!(sol.is_some());
+        debug!("Proposed solution by solver: {:?}", sol);
+        assert_eq!(sol.unwrap().len(), 5);
     }
 
     #[test]

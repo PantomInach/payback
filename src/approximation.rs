@@ -20,7 +20,7 @@ use crate::probleminstance::{ProblemInstance, Solution};
 /// use payback::probleminstance::{ProblemInstance, Solution, SolvingMethods};
 ///
 /// let instance: ProblemInstance = Graph::from(vec![-2, -1, 1, 2]).into();
-/// let solution: Solution = instance.solve_with(SolvingMethods::StarExpand);
+/// let solution: Solution = instance.solve_with(SolvingMethods::ApproxStarExpand);
 /// ```
 pub(crate) fn star_expand(instance: &ProblemInstance) -> Solution {
     debug!(
@@ -81,7 +81,7 @@ pub(crate) fn star_expand(instance: &ProblemInstance) -> Solution {
 /// use payback::probleminstance::{ProblemInstance, Solution, SolvingMethods};
 ///
 /// let instance: ProblemInstance = Graph::from(vec![-2, -1, 1, 2]).into();
-/// let solution: Solution = instance.solve_with(SolvingMethods::StarExpand);
+/// let solution: Solution = instance.solve_with(SolvingMethods::ApproxGreedySatisfaction);
 /// ```
 pub(crate) fn greedy_satisfaction(instance: &ProblemInstance) -> Solution {
     debug!(

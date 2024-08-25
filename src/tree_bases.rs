@@ -3,8 +3,10 @@ use std::collections::HashMap;
 use crate::graph::{Edge, Graph, NamedNode};
 use crate::probleminstance::{ProblemInstance, Solution};
 use itertools::Itertools;
+use log::debug;
 
 /// Algorithm solving the payback problem via a branching based approach.
+/// Has a runtime of O^*(3^n).
 ///
 ///
 /// * `instance` - The problem instance which should be solved
@@ -26,9 +28,19 @@ pub(crate) fn best_partition(
     if !instance.is_solvable() {
         return None;
     }
-    let current_sol: &mut Vec<Vec<NamedNode>> = &mut vec![];
-    let solution_partition: Vec<Vec<NamedNode>> =
-        best_partition_rec(&instance.g.vertices, current_sol);
+    let solution_partition: Vec<Vec<NamedNode>> = best_partition_rec(&instance.g.vertices);
+    debug!(
+        "Proposed solution partitioning: {:?}",
+        solution_partition
+            .iter()
+            .map(|vs| format!(
+                "[{}]",
+                vs.iter()
+                    .map(|v| format!("({},{})", v.id, v.weight))
+                    .join(", ")
+            ))
+            .join(", ")
+    );
     let solution: &mut HashMap<Edge, f64> = &mut HashMap::new();
     solution_partition
         .into_iter()
@@ -42,27 +54,34 @@ pub(crate) fn best_partition(
     Some(solution.to_owned())
 }
 
-fn best_partition_rec(
-    vertices: &[NamedNode],
-    current_sol: &mut Vec<Vec<NamedNode>>,
-) -> Vec<Vec<NamedNode>> {
+fn best_partition_rec(vertices: &[NamedNode]) -> Vec<Vec<NamedNode>> {
+    debug!("Current vertices: {:?}", vertices);
     if vertices.is_empty() {
-        return current_sol.to_vec();
+        return vec![];
     }
-    let remove_verts: &mut Vec<&NamedNode> = &mut vec![];
+    let mut best_branching: Vec<Vec<NamedNode>> = vec![];
+    let mut remove_verts: Vec<&NamedNode> = vec![];
     let subsets = zero_sum_subsets(vertices);
     let filtered_subsets = subsets
         .iter()
         .filter(|s| match s.len() {
+            0 => false,
             1 => {
+                // Remove vertices with weight zero.
+                debug!("Removing single vertex set {:?}, since this is optimal.", s);
                 remove_verts.push(s.first().unwrap());
                 false
             }
             2 => {
+                // Take pairs of vertices which cancel each other out, since this is optimal.
                 let u = s.first().unwrap();
                 let v = s.last().unwrap();
                 if !remove_verts.contains(&u) && !remove_verts.contains(&v) {
-                    current_sol.push(vec![u.clone(), v.clone()]);
+                    debug!(
+                        "Adding pair {:?} of opposite weights, since this is optimal.",
+                        s
+                    );
+                    best_branching.push(vec![u.clone(), v.clone()]);
                     remove_verts.push(u);
                     remove_verts.push(v);
                 }
@@ -71,27 +90,36 @@ fn best_partition_rec(
             _ => true,
         })
         .collect_vec();
-    filtered_subsets.into_iter().fold(vec![], |acc, s| {
+    if remove_verts.len() == vertices.len() {
+        debug!("Exiting recursion early since no vertices are left.");
+        return best_branching;
+    }
+    let best_branch = filtered_subsets.into_iter().fold(vec![], |acc, s| {
         let verts = vertices
             .iter()
             .filter(|v| !s.contains(v) && !remove_verts.contains(v))
             .cloned()
             .collect_vec();
-        let result = best_partition_rec(&verts, current_sol);
+        let mut result = best_partition_rec(&verts);
+        result.push(s.clone());
         if result.len() >= acc.len() {
             result
         } else {
             acc
         }
     });
-    current_sol.to_vec()
+    best_branching.extend(best_branch);
+    debug!("Best branching: {:?}", best_branching);
+    best_branching
 }
 
+/// Gives all subsets whose vertex weights add up to zero and no vertex with zero weight itself is
+/// contained in the subset.
 fn zero_sum_subsets(vertices: &[NamedNode]) -> Vec<Vec<NamedNode>> {
     vertices
         .iter()
         .powerset()
-        .filter(|s| s.iter().map(|n| n.weight).sum::<i64>() == 0)
+        .filter(|s| s.iter().map(|n| n.weight).sum::<i64>() == 0 && s.iter().all(|v| v.weight != 0))
         .map(|s| s.into_iter().cloned().collect_vec())
         .collect_vec()
 }
@@ -121,12 +149,28 @@ mod tests {
         let sol = best_partition(&instance, &star_expand);
         assert!(sol.is_some());
         debug!("Proposed solution by solver: {:?}", sol);
-        assert!(sol.unwrap().len() == 4);
+        assert_eq!(sol.unwrap().len(), 4);
 
         let graph: Graph = vec![-2, -1, 1, 1, 2, -2, 3, -3].into();
         debug!("Using graph: {:?}", graph);
         let instance = ProblemInstance::from(graph);
         let sol = best_partition(&instance, &star_expand);
         assert!(sol.is_none());
+
+        let graph: Graph = vec![6, 3, 2, 1, -4, -8].into();
+        debug!("Using graph: {:?}", graph);
+        let instance = ProblemInstance::from(graph);
+        let sol = best_partition(&instance, &star_expand);
+        assert!(sol.is_some());
+        debug!("Proposed solution by solver: {:?}", sol);
+        assert_eq!(sol.unwrap().len(), 4);
+
+        let graph: Graph = vec![6, 3, 2, 1, -4, -8, 0].into();
+        debug!("Using graph: {:?}", graph);
+        let instance = ProblemInstance::from(graph);
+        let sol = best_partition(&instance, &star_expand);
+        assert!(sol.is_some());
+        debug!("Proposed solution by solver: {:?}", sol);
+        assert_eq!(sol.unwrap().len(), 4);
     }
 }
